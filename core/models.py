@@ -26,6 +26,13 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
+        """
+        It creates a user, sets the is_staff and is_superuser attributes to True, and saves the user
+        
+        :param email: This is the only required field for creating a user and it must be unique
+        :param password: The password to use for this user
+        :return: The user object.
+        """
         user = self.create_user(email, password, **extra_fields)
         user.is_staff = True
         user.is_superuser = True
