@@ -1,6 +1,7 @@
 from lib2to3.pytree import Base
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.utils.translation import gettext as _
 
 # Create your models here.
 
@@ -15,6 +16,9 @@ class UserManager(BaseUserManager):
         :param password: The password to use for this user
         :return: A user object.
         """
+        if not email:
+            raise ValueError(_("User must have an email address"))
+
         user = self.model(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
