@@ -5,5 +5,9 @@
         "--max-line-length=120",
         "--ignore=E402, F841, F401, E302, E305"
     ],
-    "python.linting.pycodestyleEnabled": true
+    "python.linting.pycodestyleEnabled": true,
+    "python.linting.pycodestyleArgs": [
+        "--max-line-length=120",
+        "--ignore=E402, F841, F401, E302, E305"
+    ],
 }

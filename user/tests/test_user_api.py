@@ -7,7 +7,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
 
-CREATE_USER_URL = reverse('user:user-list')
+CREATE_USER_URL = reverse('user:create')
 TOKEN_URL = reverse('user:token')
 
 
@@ -71,7 +71,7 @@ class PublicUserApiTests(TestCase):
         """
         payload = {
             'email': 'test@gmail.com',
-            'password': 'testpass123',
+            'password': 'test',
             'name': 'test1'
         }
 
@@ -101,14 +101,14 @@ class PublicUserApiTests(TestCase):
 
         response = self.client.post(TOKEN_URL, payload)
 
-        self.assertIn('token', response)
+        self.assertIn('token', response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_create_token_invalid_credentials(self):
         """
         We create a user, then we try to create a token with the wrong password
         """
-        create_user({'email': 'test@gmail.com', 'password': 'testpass123'})
+        create_user(**{'email': 'test@gmail.com', 'password': 'testpass123'})
         payload = {
             'email': 'test@gmail.com',
             'password': 'wrongpass',
