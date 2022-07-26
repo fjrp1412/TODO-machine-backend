@@ -156,7 +156,7 @@ class PublicUserApiTests(TestCase):
         We're testing that if we make a GET request to the ME_URL, we get a 401 unauthorized status code
         """
         response = self.client.get(ME_URL)
-        self.assertEqual(response.staus_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     class PrivateUserApiTests(TestCase):
 
@@ -168,24 +168,35 @@ class PublicUserApiTests(TestCase):
             self.client.force_authenticate(user=self.user)
 
         def test_retrieve_user_success(self):
+            """
+            We're testing that when we make a GET request to the ME_URL, we get a 200 response, and that the
+            response data is the same as the data we passed in when we created the user
+            """
             response = self.client.get(ME_URL)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(
                 response.data, {'email': 'test@gmail.com', 'name': 'test name 1'})
 
         def test_post_me_not_allowed(self):
+            """
+            It tests that a POST request to the `/users/me/` endpoint returns a 405 status code
+            """
             response = self.client.post(ME_URL, {})
             self.assertEqual(response.status_code,
                              status.HTTP_405_METHOD_NOT_ALLOWED)
 
         def test_update_user_profile(self):
+            """
+            We're testing that when we send a PATCH request to the ME_URL with a payload of a new password and
+            name, the user's name and password are updated in the database and the response status code is 200
+            """
             payload = {
                 'password': 'newpassword',
                 'name': 'new name'
             }
 
             response = self.client.patch(ME_URL, payload)
-            
+
             self.user.refresh_from_db()
 
             self.assertEqual(self.user.name, payload['name'])
