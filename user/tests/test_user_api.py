@@ -1,3 +1,5 @@
+from os import stat
+from venv import create
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -6,6 +8,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 CREATE_USER_URL = reverse('user:user-list')
+TOKEN_URL = reverse('user:token')
 
 
 def create_user(**params):
@@ -68,7 +71,7 @@ class PublicUserApiTests(TestCase):
         """
         payload = {
             'email': 'test@gmail.com',
-            'password': 'test',
+            'password': 'testpass123',
             'name': 'test1'
         }
 
@@ -80,3 +83,68 @@ class PublicUserApiTests(TestCase):
             email=payload['email']).exists()
 
         self.assertFalse(user_exists)
+
+    def test_create_token_valid_user(self):
+        """
+        We're creating a user, then we're using the client to make a post
+        request to the token url, and we're passing in the payload.
+
+        Then, we're checking if in the request exist the auth token and the
+        response status
+        """
+        payload = {
+            'email': 'test@gmail.com',
+            'password': 'testpass134',
+            'name': 'test1'
+        }
+        create_user(**payload)
+
+        response = self.client.post(TOKEN_URL, payload)
+
+        self.assertIn('token', response)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_create_token_invalid_credentials(self):
+        """
+        We create a user, then we try to create a token with the wrong password
+        """
+        create_user({'email': 'test@gmail.com', 'password': 'testpass123'})
+        payload = {
+            'email': 'test@gmail.com',
+            'password': 'wrongpass',
+            'name': 'test1'
+        }
+
+        response = self.client.post(TOKEN_URL, payload)
+
+        self.assertNotIn('token', response.data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_token_no_user(self):
+        """
+        We're testing that if we try to create a token with a user that doesn't exist, we get a 400 response
+        """
+        payload = {
+            'email': 'test@gmail.com',
+            'password': 'wrongpass',
+            'name': 'test1'
+        }
+        response = self.client.post(TOKEN_URL, payload)
+
+        self.assertNotIn('token', response.data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_token_incomplete_fields(self):
+        """
+        We're testing that if we send a POST request to the token url with an incomplete payload, we should
+        get a 400 response
+        """
+        payload = {
+            'email': 'test@gmail.com',
+            'name': 'test1'
+        }
+
+        response = self.client.post(TOKEN_URL, payload)
+
+        self.assertNotIn('token', response.data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
