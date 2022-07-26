@@ -1,4 +1,5 @@
-from os import stat
+import email
+from re import S
 from venv import create
 from django.test import TestCase
 from django.contrib.auth import get_user_model
@@ -9,6 +10,7 @@ from rest_framework import status
 
 CREATE_USER_URL = reverse('user:create')
 TOKEN_URL = reverse('user:token')
+ME_URL = reverse('user:me')
 
 
 def create_user(**params):
@@ -51,7 +53,7 @@ class PublicUserApiTests(TestCase):
     def test_user_exist(self):
         """
         We create a user with the payload, then we try to create another
-        user with the same payload. We expect the second request to fail 
+        user with the same payload. We expect the second request to fail
         because the email is already taken.
         """
         payload = {
@@ -148,3 +150,44 @@ class PublicUserApiTests(TestCase):
 
         self.assertNotIn('token', response.data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_retrieve_unauthorized_user(self):
+        """
+        We're testing that if we make a GET request to the ME_URL, we get a 401 unauthorized status code
+        """
+        response = self.client.get(ME_URL)
+        self.assertEqual(response.staus_code, status.HTTP_401_UNAUTHORIZED)
+
+    class PrivateUserApiTests(TestCase):
+
+        def setUp(self):
+            self.user = create_user(
+                email='test@gmail.com', password='testpass123', name='test name 1')
+            self.client = APIClient()
+
+            self.client.force_authenticate(user=self.user)
+
+        def test_retrieve_user_success(self):
+            response = self.client.get(ME_URL)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(
+                response.data, {'email': 'test@gmail.com', 'name': 'test name 1'})
+
+        def test_post_me_not_allowed(self):
+            response = self.client.post(ME_URL, {})
+            self.assertEqual(response.status_code,
+                             status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        def test_update_user_profile(self):
+            payload = {
+                'password': 'newpassword',
+                'name': 'new name'
+            }
+
+            response = self.client.patch(ME_URL, payload)
+            
+            self.user.refresh_from_db()
+
+            self.assertEqual(self.user.name, payload['name'])
+            self.assertTrue(self.user.check_password(payload['password']))
+            self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -37,10 +37,10 @@ class AuthTokenSerializer(serializers.Serializer):
         """
         It takes the email and password from the request,
         authenticates the user,
-        and then adds the user object to the validated data.
-        
+        and then adds the user object to the validated data
+
         The validated data is then passed to the create function
-        
+
         :param attrs: The validated data from the serializer
         :return: The user object is being returned.
         """
