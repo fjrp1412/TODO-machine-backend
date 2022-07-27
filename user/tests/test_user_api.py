@@ -1,6 +1,3 @@
-import email
-from re import S
-from venv import create
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -202,3 +199,16 @@ class PublicUserApiTests(TestCase):
             self.assertEqual(self.user.name, payload['name'])
             self.assertTrue(self.user.check_password(payload['password']))
             self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        def test_destroy_user_profile(self):
+            """
+            We're testing that when we delete a user profile, the user is no longer able to get a token
+            """
+            res_delete = self.client.delete(ME_URL)
+
+            self.assertEqual(res_delete.status_code, status.HTTP_200_OK)
+
+            res_get_token = self.client.post(TOKEN_URL, self.user)
+
+            self.assertEqual(res_get_token.status_code,
+                             status.HTTP_400_BAD_REQUEST)
