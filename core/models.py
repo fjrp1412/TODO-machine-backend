@@ -58,10 +58,16 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Workspace(models.Model):
     title = models.CharField(max_length=255)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
+                             on_delete=models.CASCADE,
+                             null=False,
+                             blank=False
+                             )
     id = models.UUIDField(
         default=uuid.uuid4,
         unique=True,
         primary_key=True,
         editable=False
     )
+
+    def __str__(self):
+        return self.title

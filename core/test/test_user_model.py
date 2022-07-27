@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 
 
-class ModelTest(TestCase):
+class UserModelTest(TestCase):
     def test_create_user_with_email(self):
         """
         We create a user with an email and password, then we assert that the user's email is equal to the
