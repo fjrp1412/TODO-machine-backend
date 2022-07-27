@@ -44,7 +44,8 @@ INSTALLED_APPS = [
 
     # custom apps
     'core',
-    'user'
+    'user',
+    'workspace'
 ]
 
 MIDDLEWARE = [

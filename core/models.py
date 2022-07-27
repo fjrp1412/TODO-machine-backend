@@ -1,8 +1,9 @@
-from lib2to3.pytree import Base
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils.translation import gettext as _
 
+import uuid
 # Create your models here.
 
 
@@ -28,7 +29,7 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         """
         It creates a user, sets the is_staff and is_superuser attributes to True, and saves the user
-        
+
         :param email: This is the only required field for creating a user and it must be unique
         :param password: The password to use for this user
         :return: The user object.
@@ -52,3 +53,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = "email"
+
+
+class Workspace(models.Model):
+    title = models.CharField(max_length=255)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        primary_key=True,
+        editable=False
+    )
