@@ -154,4 +154,3 @@ class PrivateWorkspaceApiTests(TestCase):
         ).exists()
 
         self.assertFalse(exist)
-    

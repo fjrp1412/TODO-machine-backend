@@ -20,7 +20,7 @@ class WorkspaceViewSet(viewsets.ModelViewSet):
         :return: The filter queryset is being returned.
         """
         return self.queryset.filter(user=self.request.user).order_by('-title')
-    
+
     def perform_create(self, serializer):
 
         serializer.save(user=self.request.user)

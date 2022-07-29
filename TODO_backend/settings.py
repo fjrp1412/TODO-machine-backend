@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     # custom apps
     'core',
     'user',
-    'workspace'
+    'workspace',
+    'todo'
 ]
 
 REST_FRAMEWORK = {

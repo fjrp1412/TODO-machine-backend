@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils.translation import gettext as _
+from django.utils import timezone
 
 import uuid
 # Create your models here.
@@ -71,3 +72,29 @@ class Workspace(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Todo(models.Model):
+
+    title = models.CharField(max_length=255)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE,
+                             null=False,
+                             blank=False)
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        primary_key=True,
+        editable=False)
+
+    workspace = models.ForeignKey(Workspace,
+                                  on_delete=models.CASCADE,
+                                  null=False,
+                                  blank=False)
+
+    description = models.TextField(null=True, blank=True)
+
+    priority = models.CharField(max_length=100, default='low')
+
+    created = models.DateTimeField(auto_now=True)
+    updated = models.DateField(auto_now_add=True)
