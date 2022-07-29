@@ -9,7 +9,7 @@ from rest_framework.test import APIClient
 from core.models import User, Workspace
 from workspace.serializers import WorkspaceSerializer
 
-WORKSPACE_URL = reverse('workspace:workspace-list')
+WORKSPACE_URL_LIST = reverse('workspace:workspace-list')
 
 
 def create_user(**params):
@@ -29,7 +29,7 @@ class PublicWorkspaceApiTests(TestCase):
         """
         It tests that the `/workspace` endpoint returns a 401 status code when the user is not logged in
         """
-        response = self.client.get(WORKSPACE_URL)
+        response = self.client.get(WORKSPACE_URL_LIST)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
@@ -58,7 +58,7 @@ class PrivateWorkspaceApiTests(TestCase):
             user=self.user, title='workspace test 2'
         )
 
-        response = self.client.get(WORKSPACE_URL)
+        response = self.client.get(WORKSPACE_URL_LIST)
         workspaces = Workspace.objects.all().order_by('-title')
         serializer = WorkspaceSerializer(workspaces, many=True)
 
@@ -82,7 +82,7 @@ class PrivateWorkspaceApiTests(TestCase):
             user=user2, title='workspace test user 2'
         )
 
-        response = self.client.get(WORKSPACE_URL)
+        response = self.client.get(WORKSPACE_URL_LIST)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
 
@@ -95,7 +95,7 @@ class PrivateWorkspaceApiTests(TestCase):
             'user': self.user.pk
         }
 
-        response = self.client.post(WORKSPACE_URL, payload)
+        response = self.client.post(WORKSPACE_URL_LIST, payload)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -107,12 +107,51 @@ class PrivateWorkspaceApiTests(TestCase):
         self.assertTrue(exist)
 
     def test_create_workspace_invalid(self):
+        """
+        We're testing that if we send an empty title, we get a 400 response
+        """
         payload = {
             'title': '',
             'user': self.user.id
         }
 
-        response = self.client.post(WORKSPACE_URL, payload)
+        response = self.client.post(WORKSPACE_URL_LIST, payload)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_update_workpsace(self):
+        """
+        We create a new workspace, then we update it with a new title
+        """
+        new_workspace = Workspace.objects.create(
+            user=self.user, title='workspace test 1')
+
+        payload = {
+            'title': 'updated title'
+        }
+
+        response = self.client.patch(
+            reverse('workspace:workspace-detail', args=[new_workspace.pk]), payload)
+
+        new_workspace.refresh_from_db()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['title'], new_workspace.title)
+        self.assertEqual(response.data['title'], payload['title'])
+
+    def test_destroy_workspace(self):
+        workspace = Workspace.objects.create(
+            user=self.user, title='workspace test 1')
+
+        response = self.client.delete(
+            reverse('workspace:workspace-detail', args=[workspace.pk]))
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        exist = Workspace.objects.filter(
+            user=self.user,
+            title=workspace.title
+        ).exists()
+
+        self.assertFalse(exist)
+    

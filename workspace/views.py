@@ -6,10 +6,7 @@ from core.models import Workspace
 from workspace import serializers
 
 
-class WorkspaceViewSet(viewsets.GenericViewSet,
-                       mixins.ListModelMixin,
-                       mixins.CreateModelMixin
-                       ):
+class WorkspaceViewSet(viewsets.ModelViewSet):
 
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
