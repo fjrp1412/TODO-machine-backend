@@ -92,20 +92,27 @@ class PrivateWorkspaceApiTests(TestCase):
         """
         payload = {
             'title': 'Workspace test 1',
-            'user': self.user
+            'user': self.user.pk
         }
 
         response = self.client.post(WORKSPACE_URL, payload)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, payload)
-    
+
+        exist = Workspace.objects.filter(
+            user=self.user,
+            title=payload['title']
+        ).exists()
+
+        self.assertTrue(exist)
+
     def test_create_workspace_invalid(self):
         payload = {
             'title': '',
-            'user': self.user
+            'user': self.user.id
         }
 
         response = self.client.post(WORKSPACE_URL, payload)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
