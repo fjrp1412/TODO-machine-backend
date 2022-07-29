@@ -85,3 +85,27 @@ class PrivateWorkspaceApiTests(TestCase):
         response = self.client.get(WORKSPACE_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
+
+    def test_create_workspace(self):
+        """
+        We're creating a new workspace with a title and a user
+        """
+        payload = {
+            'title': 'Workspace test 1',
+            'user': self.user
+        }
+
+        response = self.client.post(WORKSPACE_URL, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data, payload)
+    
+    def test_create_workspace_invalid(self):
+        payload = {
+            'title': '',
+            'user': self.user
+        }
+
+        response = self.client.post(WORKSPACE_URL, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
