@@ -1,3 +1,4 @@
+from ast import arg
 from django.test import TestCase
 from django.urls import reverse
 
@@ -157,6 +158,10 @@ class PrivateTodoApiTests(TestCase):
         self.assertEqual(response.data[0]['workspace'], self.workspace.pk)
 
     def test_edit_todo(self):
+        """
+        We create a todo, then we update it and check that the response is 200 and that the data is not the
+        same as the payload
+        """
         payload = {
             'title': 'test todo',
             'user': self.user,
@@ -171,3 +176,26 @@ class PrivateTodoApiTests(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotEqual(response.data, payload)
+
+    def test_destroy_todo(self):
+        """
+        We create a todo, then we delete it and check that it doesn't exist anymore
+        """
+        payload = {
+            'title': 'test todo',
+            'user': self.user,
+            'workspace': self.workspace,
+            'priority': 'low',
+            'description': 'descripcion',
+        }
+
+        todo_test = models.Todo.objects.create(**payload)
+
+        response = self.client.delete(
+            reverse('todo:todo-detail', args=[todo_test.pk]))
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        exist = models.Todo.objects.filter(id=todo_test.pk).exists()
+
+        self.assertFalse(exist)
