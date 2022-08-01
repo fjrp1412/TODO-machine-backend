@@ -6,7 +6,6 @@ from rest_framework.test import APIClient
 
 from core import models
 from todo.serializers import TodoSerializer
-from workspace.tests.test_workspace_api import WORKSPACE_URL_LIST
 
 TODO_URL_LIST = reverse('todo:todo-list')
 
@@ -68,6 +67,12 @@ class PrivateTodoApiTests(TestCase):
         self.assertEqual(response.data, serializer.data)
 
     def test_retrieve_limited_user(self):
+        """
+        We create a new user and a new workspace, then we create a new todo for that user and workspace.
+        Then we create two more todos for the original user and workspace. Then we make a GET request to the
+        workspace list endpoint and assert that the response data contains only the two todos for the
+        original user and workspace
+        """
         payload = {'email': 'test2@gmail.com', 'password': 'testpass123'}
 
         user2 = create_user(**payload)
@@ -98,9 +103,55 @@ class PrivateTodoApiTests(TestCase):
             priority='low'
         )
 
-        response = self.client.get(WORKSPACE_URL_LIST)
+        response = self.client.get(TODO_URL_LIST)
         todos = models.Todo.objects.all()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 3)
-        self.assertEqual(len(todos), 4)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(todos), 3)
+
+    def test_retrieve_todos_for_given_workspace(self):
+        """
+        We create a new workspace, then create 3 todos, 2 of which are assigned to the first workspace, and
+        1 to the second. 
+        
+        Then we make a GET request to the todo list endpoint, passing in the first workspace's pk as a query
+        parameter. 
+        
+        We assert that the response status code is 200, that the length of the response data is 2, and that
+        the first item in the response data has the first workspace's pk as its workspace.
+        """
+        
+        workspace2 = models.Workspace.objects.create(
+            user=self.user, title='workspace test 2')
+
+        models.Todo.objects.create(
+            title='Test todo 1',
+            user=self.user,
+            workspace=self.workspace,
+            description='Test todo description',
+            priority='low'
+        )
+
+        models.Todo.objects.create(
+            title='Test todo 2',
+            user=self.user,
+            workspace=self.workspace,
+            description='Test todo description',
+            priority='low'
+        )
+
+        models.Todo.objects.create(
+            title='Test todo 2',
+            user=self.user,
+            workspace=workspace2,
+            description='Test todo description',
+            priority='low'
+        )
+
+        response = self.client.get(
+            f'{TODO_URL_LIST}?workspace={self.workspace.pk}')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['workspace'], self.workspace.pk)
