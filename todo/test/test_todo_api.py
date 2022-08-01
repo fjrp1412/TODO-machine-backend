@@ -114,14 +114,14 @@ class PrivateTodoApiTests(TestCase):
         """
         We create a new workspace, then create 3 todos, 2 of which are assigned to the first workspace, and
         1 to the second. 
-        
+
         Then we make a GET request to the todo list endpoint, passing in the first workspace's pk as a query
         parameter. 
-        
+
         We assert that the response status code is 200, that the length of the response data is 2, and that
         the first item in the response data has the first workspace's pk as its workspace.
         """
-        
+
         workspace2 = models.Workspace.objects.create(
             user=self.user, title='workspace test 2')
 
@@ -155,3 +155,19 @@ class PrivateTodoApiTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
         self.assertEqual(response.data[0]['workspace'], self.workspace.pk)
+
+    def test_edit_todo(self):
+        payload = {
+            'title': 'test todo',
+            'user': self.user,
+            'workspace': self.workspace,
+            'priority': 'low',
+            'description': 'descripcion',
+        }
+        todo_test = models.Todo.objects.create(**payload)
+
+        response = self.client.patch(reverse('todo:todo-detail',
+                                             args=[todo_test.pk]), {'title': 'test todo updated'})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(response.data, payload)
