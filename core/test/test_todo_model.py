@@ -36,4 +36,3 @@ class TodoModelTest(TestCase):
         self.assertEqual(todo.workspace, self.workspace)
         self.assertEqual(todo.title, 'todo test 1')
         self.assertTrue(exist)
-    
