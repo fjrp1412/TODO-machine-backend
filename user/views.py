@@ -20,10 +20,13 @@ class ManageUserView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
 
+    def get_queryset(self):
+        return models.User.objects.filter(id=self.request.user.id)
+
     def retrieve(self, request, *args, **kwargs):
         """
         It retrieves the user and all of their workspaces
-        
+
         :param request: The request object
         :return: The user and the workspaces associated with that user.
         """
