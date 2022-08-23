@@ -1,9 +1,12 @@
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 
-from core.models import Workspace
-from workspace import serializers
+from core.models import Workspace, Todo
+from workspace.serializers import WorkspaceSerializer
+from todo.serializers import TodoSerializer
 
 
 class WorkspaceViewSet(viewsets.ModelViewSet):
@@ -11,7 +14,7 @@ class WorkspaceViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
     queryset = Workspace.objects.all()
-    serializer_class = serializers.WorkspaceSerializer
+    serializer_class = WorkspaceSerializer
 
     def get_queryset(self):
         """
@@ -24,3 +27,15 @@ class WorkspaceViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
 
         serializer.save(user=self.request.user)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        workspace_serialized = self.serializer_class(instance)
+
+        todos = Todo.objects.filter(workspace=instance)
+        todos_serialized = TodoSerializer(todos, many=True)
+
+        return Response({
+            'workspace': workspace_serialized.data,
+            'TODOs': todos_serialized.data
+        })

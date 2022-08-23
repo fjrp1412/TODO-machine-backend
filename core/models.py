@@ -95,6 +95,7 @@ class Todo(models.Model):
     description = models.TextField(null=True, blank=True)
 
     priority = models.CharField(max_length=100, default='low')
+    completed = models.BooleanField(default=False)
 
     created = models.DateTimeField(auto_now=True)
     updated = models.DateField(auto_now_add=True)
