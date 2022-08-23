@@ -29,6 +29,13 @@ class WorkspaceViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def retrieve(self, request, *args, **kwargs):
+        """
+        We're overriding the retrieve function because we want to return the workspace and all of its TODOs
+        in one response.
+        
+        :param request: The request object
+        :return: A workspace object and a list of TODO objects
+        """
         instance = self.get_object()
         workspace_serialized = self.serializer_class(instance)
 
