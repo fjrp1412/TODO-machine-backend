@@ -22,3 +22,6 @@ class TodoViewSet(viewsets.ModelViewSet):
             self.queryset = self.queryset.filter(
                 workspace=self.request.GET.get('workspace'))
         return self.queryset
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
