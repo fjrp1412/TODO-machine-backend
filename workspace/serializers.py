@@ -5,5 +5,5 @@ from core.models import Workspace
 class WorkspaceSerializer(ModelSerializer):
     class Meta:
         model = Workspace
-        fields = ('id', 'title', 'user')
-        ready_only_fields = ('id', )
+        fields = ('id', 'title')
+        ready_only_fields = ('id', 'user',)
