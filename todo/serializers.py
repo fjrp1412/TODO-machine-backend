@@ -8,5 +8,5 @@ class TodoSerializer(ModelSerializer):
     class Meta:
         model = Todo
         fields = ('id', 'title', 'workspace',
-                  'completed', 'description', 'priority')
+                  'completed', 'description', 'priority', 'status')
         ready_only_fields = ('id',)

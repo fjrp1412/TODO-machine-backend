@@ -96,6 +96,7 @@ class Todo(models.Model):
 
     priority = models.CharField(max_length=100, default='low')
     completed = models.BooleanField(default=False)
+    status = models.CharField(max_length=100, default='pending')
 
     created = models.DateTimeField(auto_now=True)
     updated = models.DateField(auto_now_add=True)
