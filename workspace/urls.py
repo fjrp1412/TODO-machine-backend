@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter
 from workspace import views
 
 router = DefaultRouter()
-router.register('workspace', views.WorkspaceViewSet)
+router.register('', views.WorkspaceViewSet)
 
 
 app_name = 'workspace'
