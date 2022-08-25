@@ -45,6 +45,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
 
+    #cors
+    'corsheaders',
+
     # custom apps
     'core',
     'user',
@@ -70,6 +73,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # cors middleware
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'TODO_backend.urls'
@@ -146,3 +153,6 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'core.user'
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORWS_ALLOW_CREDENTIALS = True
