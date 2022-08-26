@@ -76,7 +76,7 @@ class Workspace(models.Model):
 
 class Todo(models.Model):
 
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, default='Title')
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE,
                              null=False,
