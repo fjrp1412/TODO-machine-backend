@@ -57,7 +57,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Workspace(models.Model):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, default='Workspace')
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE,
                              null=False,
