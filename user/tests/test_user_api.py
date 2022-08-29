@@ -5,6 +5,8 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
 
+from core.models import Workspace
+
 CREATE_USER_URL = reverse('user:create')
 TOKEN_URL = reverse('user:token')
 ME_URL = reverse('user:me')
@@ -28,9 +30,8 @@ class PublicUserApiTests(TestCase):
 
     def test_create_valid_user_success(self):
         """
-        We're creating a user with a valid payload, and then checking that the
-        response is 201, and that the user exists in the database and if the
-        password is not in the request object.
+        We're testing that when we send a POST request to the CREATE_USER_URL with a valid payload, we get a
+        201 response, and that the user and workspace objects are created
         """
         payload = {
             'email': 'test@gmail.com',
@@ -43,9 +44,11 @@ class PublicUserApiTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         user = get_user_model().objects.get(**response.data)
-        self.assertTrue(user.check_password(payload['password']))
+        workspace = Workspace.objects.get(user=user)
 
+        self.assertTrue(user.check_password(payload['password']))
         self.assertNotIn('password', response.data)
+        self.assertTrue(workspace.user, user)
 
     def test_user_exist(self):
         """

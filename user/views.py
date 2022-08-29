@@ -14,6 +14,19 @@ from core import models
 class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
 
+    def create(self, request, *args, **kwargs):
+        """
+        It creates a new user, then creates a new workspace for that user
+
+        :param request: The request object
+        :return: The response is being returned.
+        """
+        response = super().create(request, *args, **kwargs)
+        user = get_user_model().objects.get(id=response.data['id'])
+
+        models.Workspace.objects.create(user=user, title='Home')
+        return response
+
 
 class ManageUserView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
