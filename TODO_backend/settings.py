@@ -107,26 +107,18 @@ WSGI_APPLICATION = 'TODO_backend.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-DATABASES = {}
 
-if DEBUG:
-
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ['DEV_DB_NAME'],
-            'USER': os.environ['DEV_DB_USER'],
-            'PASSWORD': os.environ['DEV_DB_PASSWORD'],
-            'HOST': os.environ['DEV_DB_HOST'],
-            'PORT': '',
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ['DEV_DB_NAME'],
+        'USER': os.environ['DEV_DB_USER'],
+        'PASSWORD': os.environ['DEV_DB_PASSWORD'],
+        'HOST': os.environ['DEV_DB_HOST'],
+        'PORT': '',
     }
+}
 
-else:
-    DATABASES = {
-        'default': dj_database_url.config(
-            default='postgresql://postgres:postgres@localhost:5432/mysite',
-            conn_max_age=600)}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
