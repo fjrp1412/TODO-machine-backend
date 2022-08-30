@@ -111,10 +111,10 @@ WSGI_APPLICATION = 'TODO_backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ['DEV_DB_NAME'],
-        'USER': os.environ['DEV_DB_USER'],
-        'PASSWORD': os.environ['DEV_DB_PASSWORD'],
-        'HOST': os.environ['DEV_DB_HOST'],
+        'NAME': os.environ['DB_NAME'],
+        'USER': os.environ['DB_USER'],
+        'PASSWORD': os.environ['DB_PASSWORD'],
+        'HOST': os.environ['DB_HOST'],
         'PORT': '',
     }
 }
