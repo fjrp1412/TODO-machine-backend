@@ -1,7 +1,7 @@
 databases:
-  - name: TODO_machine_backend
-    databaseName: TODO_machine_backend
-    user: TODO_machine_backend
+  - name: todo_machine_backend
+    databaseName: todo_machine_backend
+    user: todo_machine_backend
 
 services:
   - type: web
